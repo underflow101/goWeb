@@ -26,6 +26,10 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
+func MainPage(c echo.Context) error {
+	return c.String(http.StatusOK, "This is main page. Nothing else.")
+}
+
 func main() {
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
@@ -52,8 +56,9 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routing
+	e.GET("/", MainPage)
 	e.GET("/hello", hello)
 
 	// Start Server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":3000"))
 }

@@ -6,6 +6,7 @@ package main
 
 import (
 	"net/http"
+	"firstPractice/middlewareCustom"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -33,11 +34,11 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	s := NewStats()
+	s := middlewareCustom.NewStats()
 	e.Use(s.Process)
 	e.GET("/stats", s.Handle)
 
-	e.Use(ServerHeader)
+	e.Use(middlewareCustom.ServerHeader)
 
 	// Routing
 	e.GET("/", MainPage)

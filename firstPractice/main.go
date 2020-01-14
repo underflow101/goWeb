@@ -6,8 +6,6 @@ package main
 
 import (
 	"net/http"
-	"sync"
-	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -18,15 +16,6 @@ type Trainer struct {
 	Age  int
 	City string
 }
-
-type (
-	Stats struct {
-		Uptime       time.Time      `json:"uptime"`
-		RequestCount uint64         `json:"requestCount"`
-		Status       map[string]int `json:"status"`
-		mutex        sync.RWMutex
-	}
-)
 
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
@@ -43,6 +32,12 @@ func main() {
 	// use middleware for logging
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	s := NewStats()
+	e.Use(s.Process)
+	e.GET("/stats", s.Handle)
+
+	e.Use(ServerHeader)
 
 	// Routing
 	e.GET("/", MainPage)

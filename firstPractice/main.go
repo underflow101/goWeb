@@ -8,12 +8,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/engine/standard"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -22,6 +20,10 @@ type Trainer struct {
 	Name string
 	Age  int
 	City string
+}
+
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!")
 }
 
 func main() {
@@ -41,7 +43,7 @@ func main() {
 	fmt.Println("Connected to MongoDB")
 
 	collection := client.Database("test").Collection("trainers")
-
+	fmt.Println(collection)
 	// create instance
 	e := echo.New()
 
@@ -50,8 +52,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routing
-	e.Get("/hello", handle.MainPage())
+	e.GET("/hello", hello)
 
-	// Run Server
-	e.Run(standard.New(":27017"))
+	// Start Server
+	e.Logger.Fatal(e.Start(":1323"))
 }

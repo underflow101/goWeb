@@ -5,15 +5,12 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Trainer struct {
@@ -21,6 +18,15 @@ type Trainer struct {
 	Age  int
 	City string
 }
+
+type (
+	Stats struct {
+		Uptime       time.Time      `json:"uptime"`
+		RequestCount uint64         `json:"requestCount"`
+		Status       map[string]int `json:"status"`
+		mutex        sync.RWMutex
+	}
+)
 
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
@@ -31,23 +37,6 @@ func MainPage(c echo.Context) error {
 }
 
 func main() {
-	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Connected to MongoDB")
-
-	collection := client.Database("test").Collection("trainers")
-	fmt.Println(collection)
 	// create instance
 	e := echo.New()
 

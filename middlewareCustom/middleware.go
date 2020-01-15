@@ -1,30 +1,13 @@
 package middlewareCustom
 
 import (
-	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/labstack/echo"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-// DB connection
-const connectionString = "mongodb://localhost:27017"
-
-// DB name
-const dbName = "test"
-
-// Collection name
-const collecName = "shoppingMall"
-
-// collection object/instance
-var collection *mongo.Collection
 
 // middleware
 type (
@@ -41,34 +24,6 @@ func Newstats() *Stats {
 		Uptime:   time.Now(),
 		Statuses: map[string]int{},
 	}
-}
-
-// create connection with mongodb
-func init() {
-	clientOptions := options.Client().ApplyURI(connectionString)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Connected to MongoDB")
-
-	collection := client.Database(dbName).Collection(collecName)
-	fmt.Println(collection)
-}
-
-// close mongodb
-func closeDB(client *mongo.Client) {
-	err := client.Disconnect(context.TODO())
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Connection to MongoDB closed.")
 }
 
 // process is for middleware

@@ -1,9 +1,21 @@
-package controller
+package handler
 
 import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type (
+	// DB Handler
+	Handler struct {
+		DB *mongo.Session
+	}
+)
+
+const (
+	Key = "secret"
 )
 
 // Systemic routes configuration

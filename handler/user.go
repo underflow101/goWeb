@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo"
 	"github.com/dgrijalva/jwt-go"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/labstack/echo"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func (h *Handler) Signup(c echo.Context) (err error) {
@@ -48,13 +48,45 @@ func (h *Handler) Login(c echo.Context) (err error) {
 			return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "invalid Email or password"}
 		}
 		return
-	
-// JWT
-// Create token
-token := jwt.New(jwt.SigningMethodHS256)
+	}
 
-// Set claim
-claims := token.Claims.(jwt.MapClaims)
-claims["id"] = u.ID
-claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	// JWT
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
 
+	// Set claim
+	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = u.ID
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	// Gen encoded token and send it as response
+	u.Token, err = token.SignedString([]byte(Key))
+	if err != nil {
+		return err
+	}
+
+	u.Password = "" // We Do Not Send Password
+	return c.JSON(http.StatusOK, u)
+}
+
+func userIDFromToken(c echo.Context) string {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return claims["id"].(string)
+}
+
+func (h *Handler) Follow(c echo.Context) (err error) {
+	userID := userIDFromToken(c)
+	id := c.Param("id")
+
+	// Add a follower to user
+	db := h.DB.Clone()
+	defer db.Close()
+	if err = db.DB("bird").C("users").
+		UpdateId(bson.ObjectIdHex(id), bson.M{"$addToSet": bson.M{"followers": userID}}); err != nil {
+		if err == mgo.ErrNotFound {
+			return echo.ErrNotFound
+		}
+	}
+	return
+}

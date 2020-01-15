@@ -5,8 +5,8 @@
 package main
 
 import (
-	"goWeb/middlewareCustom"
 	"net/http"
+	"firstPractice/middlewareCustom"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"

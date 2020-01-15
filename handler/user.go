@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/dgrijalva/jwt-go"
@@ -51,4 +52,9 @@ func (h *Handler) Login(c echo.Context) (err error) {
 // JWT
 // Create token
 token := jwt.New(jwt.SigningMethodHS256)
-}
+
+// Set claim
+claims := token.Claims.(jwt.MapClaims)
+claims["id"] = u.ID
+claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+

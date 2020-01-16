@@ -9,4 +9,5 @@ type Post struct {
 	To      string        `json:"to" bson:"to"`
 	From    string        `json:"from" bson:"from"`
 	Message string        `json:"message" bson:"message"`
+	Product bson.ObjectId `json:"product" bson:"_product,omitempty"`
 }

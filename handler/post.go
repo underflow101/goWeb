@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"goWeb/model"
 	"net/http"
 	"strconv"
 
@@ -62,11 +63,11 @@ func (h *Handler) FetchPost(c echo.Context) (err error) {
 	if err = db.DB("bird").C("posts").
 		Find(bson.M{"to": userID}).
 		Skip((page - 1) * limit).
-		Limit(limit)
+		Limit(limit).
 		All(&posts); err != nil {
-			return
-		}
-		defer db.Close()
+		return
+	}
+	defer db.Close()
 
-		return c.JSON(http.StatusOK, posts)
+	return c.JSON(http.StatusOK, posts)
 }

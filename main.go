@@ -68,7 +68,7 @@ func main() {
 	e.POST("/signup", h.Signup)
 	e.POST("/login", h.Login)
 	e.POST("/follow/:id", h.Follow)
-	//e.GET("/product", h.Product)
+	e.GET("/product", h.Product)
 	e.GET("/feed", h.FetchPost)
 	e.POST("/posts", h.CreatePost)
 

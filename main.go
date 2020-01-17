@@ -5,12 +5,16 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"goWeb/handler"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2"
 )
 
@@ -50,6 +54,21 @@ func main() {
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
+
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Connected to MongoDB! :)")
 
 	// create index
 	if err = db.Copy().DB("bird").C("users").EnsureIndex(mgo.Index{

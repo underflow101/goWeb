@@ -15,13 +15,11 @@ import (
 	"github.com/labstack/gommon/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/mgo.v2"
 )
 
 type Trainer struct {
-	Name string
-	Age  int
-	City string
+	Name     string
+	Password string
 }
 
 func hello(c echo.Context) error {
@@ -50,19 +48,19 @@ func main() {
 	}))
 
 	// connect to mongoDB
-	db, err := mgo.Dial("mongo")
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
+	// db, err := mgo.Dial("mongo")
+	// // if err != nil {
+	// // 	e.Logger.Fatal(err)
+	// // }
 
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	db, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.Ping(context.TODO(), nil)
+	err = db.Ping(context.TODO(), nil)
 
 	if err != nil {
 		log.Fatal(err)
@@ -71,12 +69,22 @@ func main() {
 	fmt.Println("Connected to MongoDB! :)")
 
 	// create index
-	if err = db.Copy().DB("bird").C("users").EnsureIndex(mgo.Index{
-		Key:    []string{"email"},
-		Unique: true,
-	}); err != nil {
+	// if err = db.Copy().DB("bird").C("users").EnsureIndex(mgo.Index{
+	// 	Key:    []string{"email"},
+	// 	Unique: true,
+	// }); err != nil {
+	// 	log.Fatal(err)
+	// }
+	collection := db.Database("test").Collection("trainers")
+
+	bear := Trainer{"Bear", "12345"}
+
+	insertRes, err := collection.InsertOne(context.TODO(), bear)
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Inserted a single user: ", insertRes.InsertedID)
 
 	// Init handler
 	h := &handler.Handler{DB: db}

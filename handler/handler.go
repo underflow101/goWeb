@@ -1,11 +1,11 @@
 package handler
 
-import "gopkg.in/mgo.v2"
+import "go.mongodb.org/mongo-driver/mongo"
 
 type (
 	// DB Handler
 	Handler struct {
-		DB *mgo.Session
+		DB *mongo.Client
 	}
 )
 
